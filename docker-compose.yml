@@ -12,4 +12,3 @@ services:
     env_file: .env
     volumes:
       - ./app:/home/webapp/app
-
