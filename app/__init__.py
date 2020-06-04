@@ -6,7 +6,6 @@ from flask_bcrypt import Bcrypt
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 
-
 # instantiate the extensions
 login_manager = LoginManager()
 bcrypt = Bcrypt()
@@ -15,9 +14,8 @@ migrate = Migrate()
 
 
 def create_app(script_info=None):
-
     # instantiate the app
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="./static")
 
     # set config
     app_settings = os.getenv(
