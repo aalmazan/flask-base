@@ -1,14 +1,28 @@
 version: "3.7"
 
 services:
-
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: ./docker/Dockerfile-web
     command: flask run --host=0.0.0.0
     ports:
-      - 5000:5000
+      - "5000:5000"
     env_file: .env
     volumes:
       - ./app:/home/webapp/app
+
+  postgres:
+    image: postgres:16-alpine
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+
+volumes:
+  pgdata:

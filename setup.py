@@ -7,7 +7,5 @@ setup(
     install_requires=[
         "flask",
     ],
-    dependency_links=[
-
-    ]
+    dependency_links=[],
 )
