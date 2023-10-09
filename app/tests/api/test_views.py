@@ -7,4 +7,3 @@ def test_urls(client):
         res = client.get(url_for(f"api.{url}"))
         assert res.status_code == 200
         assert res.json == data
-

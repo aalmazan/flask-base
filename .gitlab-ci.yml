@@ -1,0 +1,50 @@
+# To contribute improvements to CI/CD templates, please follow the Development guide at:
+# https://docs.gitlab.com/ee/development/cicd/templates.html
+# This specific template is located at:
+# https://gitlab.com/gitlab-org/gitlab/-/blob/master/lib/gitlab/ci/templates/Python.gitlab-ci.yml
+default:
+  # Official language image. Look for the different tagged releases at:
+  # https://hub.docker.com/r/library/python/tags/
+  image: python:3.11-slim-bullseye
+
+stages:
+  - build
+  - test
+
+# Change pip's cache directory to be inside the project directory since we can
+# only cache local items.
+variables:
+  PIP_CACHE_DIR: "$CI_PROJECT_DIR/.cache/pip"
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+# https://pip.pypa.io/en/stable/topics/caching/
+cache:
+  key: virtualenv
+  paths:
+    - .venv/
+
+build:
+  image: docker:24.0.6
+  services:
+    - docker:24.0.6-dind
+  stage: build
+  # Only build when there's changes to the following
+  only:
+    changes:
+      - "docker/**/*"
+      - ".gitalb-ci.yml"
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+  script:
+    - docker build --pull -t $CONTAINER_TEST_IMAGE -f docker/Dockerfile-web .
+    - docker push $CONTAINER_TEST_IMAGE
+
+test:
+  stage: test
+  image: $CONTAINER_TEST_IMAGE
+  before_script:
+    - poetry config virtualenvs.in-project true
+    - poetry install
+  script:
+    - poetry run pytest

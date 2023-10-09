@@ -1,10 +1,10 @@
 import os
 
 from flask import Flask, render_template
-from flask_login import LoginManager
 from flask_bcrypt import Bcrypt
-from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from flask_migrate import Migrate
+from flask_sqlalchemy import SQLAlchemy
 
 # instantiate the extensions
 login_manager = LoginManager()
@@ -18,9 +18,7 @@ def create_app(script_info=None):
     app = Flask(__name__, static_folder="./static")
 
     # set config
-    app_settings = os.getenv(
-        "APP_SETTINGS", "app.config.ProductionConfig"
-    )
+    app_settings = os.getenv("APP_SETTINGS", "app.config.ProductionConfig")
     app.config.from_object(app_settings)
 
     # set up extensions
@@ -30,8 +28,8 @@ def create_app(script_info=None):
     migrate.init_app(app, db)
 
     # register blueprints
-    from app.main.views import main_blueprint
     from app.api.views import api_blueprint
+    from app.main.views import main_blueprint
 
     app.register_blueprint(main_blueprint)
     app.register_blueprint(api_blueprint, url_prefix="/api")
